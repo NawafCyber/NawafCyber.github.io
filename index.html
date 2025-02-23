@@ -133,13 +133,7 @@
         <div id="oxidationNote" class="oxidation-note"></div>
     </div>
 
-    <hr>
-    <div class="image-toggle">
-        <div class="toggle-button" onclick="toggleImage()">المركبات الايونيه</div>
-        <div id="imageContainer" class="image-container">
-            <img src="i1.jpeg" alt="صورة تجريبية">
-        </div>
-    </div>
+   
 
     <script>
         function convertFormula() {
@@ -250,14 +244,8 @@
 
             document.getElementById("info").innerHTML += `<p>${elementTypes}</p>`;
         }
-        function toggleImage() {
-            const imageContainer = document.getElementById("imageContainer");
-            if (imageContainer.style.display === "none" || imageContainer.style.display === "") {
-                imageContainer.style.display = "block";
-            } else {
-                imageContainer.style.display = "none";
-            }
-        }
+        
+      
     </script>
 </body>
 </html>
