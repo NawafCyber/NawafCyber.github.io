@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محول الصيغ الكيميائية</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .container {
+            margin-top: 50px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            margin: auto;
+        }
+        input, button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            text-align: center;
+            display: inline-block;
+            width: 100%;
+        }
+        .first-element {
+            color: blue;
+            font-weight: bold;
+        }
+        .second-element {
+            color: red;
+            font-weight: bold;
+        }
+        .prefix {
+            color: green;
+            font-style: italic;
+            font-weight: bold;
+        }
+        .info {
+            margin-top: 10px;
+            font-size: 16px;
+            text-align: left;
+            color: #333;
+        }
+        .note {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .oxidation-note {
+            font-size: 14px;
+            font-style: italic;
+            color: red;
+            font-weight: bold;
+        }
+        .oxidation-green {
+            color: green;
+        }
+        .oxidation-orange {
+            color: orange;
+        }
+        .oxidation-red {
+            color: red;
+        }
+
+        .image-toggle {
+            margin-top: 50px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            margin: auto;
+        }
+
+        .toggle-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            width: 200px;
+            text-align: center;
+            font-size: 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-button:hover {
+            background-color: #0056b3;
+        }
+
+        .image-container {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>محول الصيغ الكيميائية</h2>
+        <input type="text" id="formulaInput" placeholder="أدخل الصيغة الكيميائية (مثال: N2F3)">
+        <button onclick="convertFormula()">تحويل</button>
+        <div id="result" class="result"></div>
+        <div id="info" class="info"></div>
+        <div id="oxidationNote" class="oxidation-note"></div>
+    </div>
+
+    <hr>
+    <div class="image-toggle">
+        <div class="toggle-button" onclick="toggleImage()">المركبات الايونيه</div>
+        <div id="imageContainer" class="image-container">
+            <img src="i1.jpeg" alt="صورة تجريبية">
+        </div>
+    </div>
+
+    <script>
+        function convertFormula() {
+            const prefixes = ["", "Mono", "Di", "Tri", "Tetra", "Penta", "Hexa", "Hepta", "Octa", "Nona", "Deca"];
+            const elementNames = {
+                "H": "Hydrogen", "He": "Helium", "Li": "Lithium", "Be": "Beryllium", "B": "Boron", 
+                "C": "Carbon", "N": "Nitrogen", "O": "Oxygen", "F": "Fluorine", "Ne": "Neon",
+                "Na": "Sodium", "Mg": "Magnesium", "Al": "Aluminum", "Si": "Silicon", "P": "Phosphorus",
+                "S": "Sulfur", "Cl": "Chlorine", "Ar": "Argon", "K": "Potassium", "Ca": "Calcium",
+                "Sc": "Scandium", "Ti": "Titanium", "V": "Vanadium", "Cr": "Chromium", "Mn": "Manganese",
+                "Fe": "Iron", "Co": "Cobalt", "Ni": "Nickel", "Cu": "Copper", "Zn": "Zinc"
+            };
+
+            // معلومات المجموعات ورقم الأكسدة
+            const elementInfo = {
+                "H": { group: 1, name: "Alkali Metals", oxidation: 1, type: "Non-metal" },
+                "He": { group: 18, name: "Noble Gases", oxidation: 0, type: "Non-metal" },
+                "Li": { group: 1, name: "Alkali Metals", oxidation: 1, type: "Metal" },
+                "Be": { group: 2, name: "Alkaline Earth Metals", oxidation: 2, type: "Metal" },
+                "B": { group: 13, name: "Boron Group", oxidation: 3, type: "Metalloid" },
+                "C": { group: 14, name: "Carbon Group", oxidation: 4, type: "Non-metal" },
+                "N": { group: 15, name: "Nitrogen Group", oxidation: -3, type: "Non-metal" },
+                "O": { group: 16, name: "Chalcogens", oxidation: -2, type: "Non-metal" },
+                "F": { group: 17, name: "Halogens", oxidation: -1, type: "Non-metal" },
+                "Ne": { group: 18, name: "Noble Gases", oxidation: 0, type: "Non-metal" },
+                "Na": { group: 1, name: "Alkali Metals", oxidation: 1, type: "Metal" },
+                "Mg": { group: 2, name: "Alkaline Earth Metals", oxidation: 2, type: "Metal" },
+                "Al": { group: 13, name: "Boron Group", oxidation: 3, type: "Metal" },
+                "Si": { group: 14, name: "Carbon Group", oxidation: 4, type: "Metalloid" },
+                "P": { group: 15, name: "Nitrogen Group", oxidation: -3, type: "Non-metal" },
+                "S": { group: 16, name: "Chalcogens", oxidation: -2, type: "Non-metal" },
+                "Cl": { group: 17, name: "Halogens", oxidation: -1, type: "Non-metal" },
+                "Ar": { group: 18, name: "Noble Gases", oxidation: 0, type: "Non-metal" },
+                "K": { group: 1, name: "Alkali Metals", oxidation: 1, type: "Metal" },
+                "Ca": { group: 2, name: "Alkaline Earth Metals", oxidation: 2, type: "Metal" },
+                "Sc": { group: 3, name: "Scandium Group", oxidation: 3, type: "Metal" },
+                "Ti": { group: 4, name: "Titanium Group", oxidation: 4, type: "Metal" },
+                "V": { group: 5, name: "Vanadium Group", oxidation: 5, type: "Metal" },
+                "Cr": { group: 6, name: "Chromium Group", oxidation: 3, type: "Metal" },
+                "Mn": { group: 7, name: "Manganese Group", oxidation: 2, type: "Metal" },
+                "Fe": { group: 8, name: "Iron Group", oxidation: 2, type: "Metal" },
+                "Co": { group: 9, name: "Cobalt Group", oxidation: 2, type: "Metal" },
+                "Ni": { group: 10, name: "Nickel Group", oxidation: 2, type: "Metal" },
+                "Cu": { group: 11, name: "Copper Group", oxidation: 1, type: "Metal" },
+                "Zn": { group: 12, name: "Zinc Group", oxidation: 2, type: "Metal" }
+            };
+
+            let formula = document.getElementById("formulaInput").value.trim();
+            let matches = formula.match(/([A-Z][a-z]*)(\d*)/g);
+
+            if (!matches) {
+                document.getElementById("result").innerText = "صيغة غير صحيحة! أدخل صيغة مثل N2F3";
+                return;
+            }
+
+            let result = matches.map((element, index, arr) => {
+                let parts = element.match(/([A-Z][a-z]*)(\d*)/);
+                let elementSymbol = parts[1];
+                let elementName = elementNames[elementSymbol] || elementSymbol;
+                let count = parts[2] ? parseInt(parts[2]) : 1;
+                let prefix = count > 1 ? prefixes[count] : "";
+                return `<span class="${index === 0 ? 'first-element' : 'second-element'}">${prefix}${elementName}</span>`;
+            }).join(" ");
+
+            document.getElementById("result").innerHTML = result;
+
+            let info = matches.map((element) => {
+                let parts = element.match(/([A-Z][a-z]*)(\d*)/);
+                let elementSymbol = parts[1];
+                let elementName = elementNames[elementSymbol] || elementSymbol;
+                let elementDetails = elementInfo[elementSymbol];
+
+                return `
+                    <p>${elementName}:</p>
+                    <p>المجموعة: ${elementDetails.group}</p>
+                    <p>اسم المجموعة: ${elementDetails.name}</p>
+                    <p>رقم الأكسدة: <span class="oxidation-green">${elementDetails.oxidation}</span></p>
+                `;
+            }).join("");
+
+            document.getElementById("info").innerHTML = info;
+
+            // إضافة ملاحظات حول الأكسدة
+            let oxidationNote = `<p class="oxidation-note">إذا كان رقم الأكسدة بالسالب ف معناه العنصر لا فلز</p>
+                                 <p class="oxidation-green">إذا كان رقم الأكسدة إيجابيًا ف معناه العنصر فلز</p>
+                                 <p class="oxidation-orange">العناصر الانتقالية تقع بين المجموعات 3 إلى 12
+                                 <br>
+                                 اذا كان العنصر الاول ( فلز ) والثاني ( لا فلز ) فهو مركب ايوني ونضيف نهايته ide </p>
+                        `;
+
+            document.getElementById("oxidationNote").innerHTML = oxidationNote;
+
+            // تحديد نوع العنصر
+            let elementTypes = matches.map((element) => {
+                let parts = element.match(/([A-Z][a-z]*)(\d*)/);
+                let elementSymbol = parts[1];
+                let elementDetails = elementInfo[elementSymbol];
+                let elementType = elementDetails.type;
+
+                if (elementType === "Metal") {
+                    return `${elementNames[elementSymbol]} هو فلز`;
+                } else if (elementType === "Non-metal") {
+                    return `${elementNames[elementSymbol]} هو غير فلز`;
+                } else if (elementType === "Metalloid") {
+                    return `${elementNames[elementSymbol]} هو شبه فلز`;
+                }
+            }).join("<br>");
+
+            document.getElementById("info").innerHTML += `<p>${elementTypes}</p>`;
+        }
+        function toggleImage() {
+            const imageContainer = document.getElementById("imageContainer");
+            if (imageContainer.style.display === "none" || imageContainer.style.display === "") {
+                imageContainer.style.display = "block";
+            } else {
+                imageContainer.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
